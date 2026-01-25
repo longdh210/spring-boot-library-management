@@ -1,5 +1,6 @@
 package com.example.library_management.service;
 
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.example.library_management.dto.BookDto;
 import com.example.library_management.dto.CreateBookRequest;
@@ -44,9 +45,20 @@ public class BookServiceImpl implements BookService {
 
   @Override
   @Transactional
+  @Cacheable("books")
   public BookDto getBookById(Long id) {
     Book book = bookRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+
+    simulateSlowService();
     return BookMapper.toDto(book);
+  }
+
+  private void simulateSlowService() {
+    try {
+      Thread.sleep(3000L);
+    } catch (InterruptedException e) {
+      throw new IllegalStateException(e);
+    }
   }
 }
