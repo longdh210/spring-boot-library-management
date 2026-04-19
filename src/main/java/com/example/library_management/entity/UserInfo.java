@@ -3,14 +3,14 @@ package com.example.library_management.entity;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.Id;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Entity
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@Setter
 public class UserInfo {
   @Id
   @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)

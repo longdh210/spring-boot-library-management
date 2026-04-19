@@ -1,5 +1,14 @@
 package com.example.library_management.dto;
 
-public record BookDto(Long id, String title, String content, Integer year, Long authorId,
-    String AuthorName) {
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter
+@Setter
+public class BookDto {
+    private Long id;
+    private String title;
+    private String content;
+    private Integer year;
+    private Long authorId;
 }

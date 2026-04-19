@@ -1,5 +1,7 @@
 package com.example.library_management.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -15,17 +17,19 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/books")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class BookController {
-  private final BookService bookService;
+  @Autowired
+  private BookService bookService;
 
   @PostMapping()
-  public BookDto create(@RequestBody CreateBookRequest request) {
+  public BookDto create(@RequestBody CreateBookRequest request) throws JsonProcessingException {
     return bookService.createBook(request);
   }
 
   @GetMapping("/{id}")
   public BookDto getById(@PathVariable Long id) {
+    System.out.println("Get book by id...");
     return bookService.getBookById(id);
   }
 }

@@ -19,11 +19,11 @@ public class AuthorServiceImpl implements AuthorService {
   @Override
   public AuthorDto createAuthor(AuthorDto dto) {
     Author author = new Author();
-    author.setName(dto.name());
-    author.setDayOfBirth(dto.dayOfBirth());
+    author.setName(dto.getName());
+    author.setDayOfBirth(dto.getDayOfBirth());
 
     Author saved = repository.save(author);
-    return AuthorMapper.toDto(saved);
+    return AuthorMapper.INSTANCE.toDto(saved);
   }
 
   @Override
@@ -31,6 +31,6 @@ public class AuthorServiceImpl implements AuthorService {
   public AuthorDto getAuthorById(Long id) {
     Author author = repository.findById(id)
         .orElseThrow(() -> new RuntimeException("Author not found with id: " + id));
-    return AuthorMapper.toDto(author);
+    return AuthorMapper.INSTANCE.toDto(author);
   }
 }

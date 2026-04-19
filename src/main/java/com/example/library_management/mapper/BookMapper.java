@@ -2,10 +2,14 @@ package com.example.library_management.mapper;
 
 import com.example.library_management.dto.BookDto;
 import com.example.library_management.entity.Book;
+import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
+import org.mapstruct.factory.Mappers;
 
-public class BookMapper {
-  public static BookDto toDto(Book book) {
-    return new BookDto(book.getId(), book.getTitle(), book.getContent(), book.getYear(),
-        book.getAuthor().getId(), book.getAuthor().getName());
-  }
+@Mapper
+public interface BookMapper {
+    BookMapper INSTANCE = Mappers.getMapper(BookMapper.class);
+
+    @Mapping(source = "book.author.id", target = "authorId")
+    BookDto toDto(Book book);
 }

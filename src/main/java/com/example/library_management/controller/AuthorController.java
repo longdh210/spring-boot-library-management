@@ -1,5 +1,6 @@
 package com.example.library_management.controller;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -14,9 +15,10 @@ import lombok.RequiredArgsConstructor;
 
 @RestController
 @RequestMapping("/authors")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class AuthorController {
-  private final AuthorService authorService;
+  @Autowired
+  private AuthorService authorService;
 
   @PostMapping()
   public AuthorDto create(@RequestBody AuthorDto dto) {

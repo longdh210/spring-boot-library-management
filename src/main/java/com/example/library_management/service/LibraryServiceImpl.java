@@ -21,7 +21,7 @@ public class LibraryServiceImpl implements LibraryService {
     library.setName(name);
 
     Library saved = repository.save(library);
-    return LibraryMapper.toDto(saved);
+    return LibraryMapper.INSTANCE.toDto(saved);
   }
 
   @Override
@@ -29,6 +29,6 @@ public class LibraryServiceImpl implements LibraryService {
   public LibraryDto getLibraryById(Long id) {
     Library library = repository.findById(id)
         .orElseThrow(() -> new RuntimeException("Library not found with id: " + id));
-    return LibraryMapper.toDto(library);
+    return LibraryMapper.INSTANCE.toDto(library);
   }
 }

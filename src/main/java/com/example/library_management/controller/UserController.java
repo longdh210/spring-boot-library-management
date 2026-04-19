@@ -20,7 +20,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 
 @RestController
 @RequestMapping("/auth")
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 public class UserController {
   @Autowired
   private UserInfoService service;

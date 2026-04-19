@@ -1,5 +1,11 @@
 package com.example.library_management.service;
 
+import com.example.library_management.entity.OutboxEvent;
+import com.example.library_management.mapper.BookMapper;
+import com.example.library_management.repository.OutboxEventRepository;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import com.example.library_management.dto.BookDto;
@@ -7,24 +13,36 @@ import com.example.library_management.dto.CreateBookRequest;
 import com.example.library_management.entity.Author;
 import com.example.library_management.entity.Book;
 import com.example.library_management.entity.Library;
-import com.example.library_management.mapper.BookMapper;
 import com.example.library_management.repository.AuthorRepository;
 import com.example.library_management.repository.BookRepository;
 import com.example.library_management.repository.LibraryRepository;
 import com.example.library_management.service.ServiceInterface.BookService;
 import jakarta.transaction.Transactional;
-import lombok.RequiredArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
 @Transactional
 public class BookServiceImpl implements BookService {
-  private final BookRepository bookRepository;
-  private final AuthorRepository authorRepository;
-  private final LibraryRepository libraryRepository;
+  @Autowired
+  private BookRepository bookRepository;
+
+  @Autowired
+  private AuthorRepository authorRepository;
+
+  @Autowired
+  private LibraryRepository libraryRepository;
+
+  @Autowired
+  private OutboxEventRepository outboxEventRepository;
+
+  @Autowired
+  private ObjectMapper objectMapper;
 
   @Override
-  public BookDto createBook(CreateBookRequest request) {
+  @Transactional
+  public BookDto createBook(CreateBookRequest request) throws JsonProcessingException {
     Author author = authorRepository.findById(request.authorId())
         .orElseThrow(() -> new RuntimeException("Author not found with id: " + request.authorId()));
 
@@ -37,10 +55,24 @@ public class BookServiceImpl implements BookService {
     book.setYear(request.year());
     book.setAuthor(author);
     book.setLibrary(library);
-
     Book saved = bookRepository.save(book);
 
-    return BookMapper.toDto(saved);
+    OutboxEvent outboxEvent = new OutboxEvent();
+    outboxEvent.setId(UUID.randomUUID());
+    outboxEvent.setAggregateType("BOOK");
+    outboxEvent.setAggregateId(saved.getId().toString());
+    outboxEvent.setType("BOOK_CREATED");
+    try {
+      outboxEvent.setPayload(objectMapper.writeValueAsString(BookMapper.INSTANCE.toDto(book)));
+    } catch (JsonProcessingException e) {
+      throw new RuntimeException("Failed to serialize book", e);
+    }
+    outboxEvent.setCreatedAt(LocalDateTime.now());
+    outboxEvent.setPublished(false);
+
+    outboxEventRepository.save(outboxEvent);
+
+    return BookMapper.INSTANCE.toDto(saved);
   }
 
   @Override
@@ -50,8 +82,8 @@ public class BookServiceImpl implements BookService {
     Book book = bookRepository.findById(id)
         .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
 
-    simulateSlowService();
-    return BookMapper.toDto(book);
+//    simulateSlowService();
+    return BookMapper.INSTANCE.toDto(book);
   }
 
   private void simulateSlowService() {
