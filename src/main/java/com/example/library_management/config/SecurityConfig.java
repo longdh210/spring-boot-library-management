@@ -43,7 +43,7 @@ public class SecurityConfig {
         .exceptionHandling(ex -> ex.authenticationEntryPoint(jwtAuthenticationEntryPoint)
             .accessDeniedHandler(jwtAccessDeniedHandler))
         .authorizeHttpRequests(auth -> auth
-            .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken").permitAll()
+            .requestMatchers("/auth/welcome", "/auth/addNewUser", "/auth/generateToken", "/actuator/**").permitAll()
             .requestMatchers("/auth/user/**", "/authors/**", "/libraries/**", "/books/**")
             .hasAuthority("ROLE_USER").requestMatchers("/auth/admin/**").hasAuthority("ROLE_ADMIN")
             .anyRequest().authenticated())
